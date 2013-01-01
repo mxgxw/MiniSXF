@@ -37,12 +37,17 @@ Compiling (On Windows)
 ---------------------------------------
 
 1-You will need to install CygWIN with gcc, make and zlib.
+
 2-Modify the paths to zlib inside the Makefile and run:
+
   "make"
+
 3-Check the file size with "ls -al MiniSXF.exe" and modify
 the following line on minisxf.c
   const size_t payload = <<New file size here>>;
+
 4-Run "make clean" and "make" again.
+
 5-Check if file size is the same if not repeat from 3.
 
 Note: It's possible that this will run on linux without
