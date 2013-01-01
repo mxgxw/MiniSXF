@@ -589,7 +589,6 @@ local unzFile unzOpenInternal (const void *path,
     unz64_s *s;
     ZPOS64_T central_pos;
     uLong   uL;
-    
 
     uLong number_disk;          /* number of the current dist, used for
                                    spaning ZIP, unsupported, always 0*/
@@ -604,8 +603,6 @@ local unzFile unzOpenInternal (const void *path,
     if (unz_copyright[0]!=' ')
         return NULL;
 
-
-    
     us.z_filefunc.zseek32_file = NULL;
     us.z_filefunc.ztell32_file = NULL;
     if (pzlib_filefunc64_32_def==NULL)
@@ -742,7 +739,6 @@ local unzFile unzOpenInternal (const void *path,
         (err==UNZ_OK))
         err=UNZ_BADZIPFILE;
 
-    printf("ERROR: %d",err);
     if (err!=UNZ_OK)
     {
         ZCLOSE64(us.z_filefunc, us.filestream);
@@ -1208,6 +1204,7 @@ extern int ZEXPORT unzGoToNextFile (unzFile  file)
     if (file==NULL)
         return UNZ_PARAMERROR;
     s=(unz64_s*)file;
+    
     if (!s->current_file_ok)
         return UNZ_END_OF_LIST_OF_FILE;
     if (s->gi.number_entry != 0xffff)    /* 2^16 files overflow hack */

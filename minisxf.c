@@ -50,8 +50,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #include <errno.h>
+#include <time.h>
 #include <fcntl.h>
 
 #ifdef unix
@@ -178,7 +178,7 @@ int makedir (newdir)
         p++;
       hold = *p;
       *p = 0;
-      if ((mymkdir(buffer) == -1) && (errno == ENOENT))
+      if ((mymkdir(buffer) == -1))
         {
           printf("couldn't create directory %s\n",buffer);
           free(buffer);
@@ -522,104 +522,145 @@ int do_extract_onefile(uf,filename,opt_extract_without_path,opt_overwrite,passwo
 }
 
 
+void print_copyrights() {
+   printf("MiniSXF v0.1.1\n");
+   printf("The MiniZip based Self eXtracting File\n");
+   printf("Copyright 2012-2013 Mario Gomez\n");
+   printf("More Info and copyrights on:\n");
+   printf("http://fuenteabierta.teubi.co/MiniSXF\n");
+}
+
 int main(argc,argv)
     int argc;
     char *argv[];
 {
+    // TODO: Use a windows temporal file
     const char *tmpFilename="tmp.zip";
     const char *password=NULL; // TODO: Enable password
     unzFile uf=NULL;
     int ret_value=0;
     int opt_do_extract_withoutpath=0;
-    int opt_overwrite=0;
+    int opt_overwrite=1;
+    
+    enum  {
+      COPYRIGHTS,
+      LIST,
+      EXTRACT
+    } OP;
     
     char buffer[WRITEBUFFERSIZE];
     
-    if(argc==2 && strcmp(argv[1],"-v")==0) {
-      printf("MiniSXF v0.1\n");
-      printf("Copyright 2012-2013\n");
-      printf("Mario Gomez ( http://fuenteabierta.teubi.co )\n");
-      printf("This software was developed with t\n");
-      printf("Based on minizip example on http://www.winimage.com/zLibDll/minizip.html\n");
+    if(argc==2) {
+        if(strcmp(argv[1],"-v")==0) {
+            OP = COPYRIGHTS;
+        }
+        if(strcmp(argv[1],"-l")==0) {
+           OP = LIST;
+        }
+    } else {
+      OP = EXTRACT;
     }
     
-    // Note: Update the file size each time that this source file is
-    // compiled.. and compile it again and verify the size.
-    // We also can use a "marker" at the end of the "exe" file, but the
-    // idea was to use nothing more than gcc to generate the executable
-    // so this is the most simple and easy solution because it's
-    // supposed that after compiling the file size it's not going to
-    // change anymore.
-    // payload: Position of the payload on the "final" file.
-    const size_t payload = 146104; // <-Update this size (DO NOT REMOVE THIS COMMENT)
+    if(OP==COPYRIGHTS) {
+      print_copyrights();
+      return 0;
+    }
+    if(OP==LIST || OP==EXTRACT) {
     
-    const size_t buffSize = WRITEBUFFERSIZE;
+        // FIRST: Try to extract the payload.
+        
+        // Note: Update the file size each time that this source file is
+        // compiled.. and compile it again and verify the size.
+        // We also can use a "marker" at the end of the "exe" file, but the
+        // idea was to use nothing more than gcc to generate the executable
+        // so this is the most simple and easy solution because it's
+        // supposed that after compiling the file size it's not going to
+        // change anymore.
+        // payload: Position of the payload on the "final" file.
+        const size_t payload = 151945; // <-Update this size (DO NOT REMOVE THIS COMMENT)
     
-    size_t count = 0; // Just to keep track of the file size
-    size_t readed =  0;
+        const size_t buffSize = WRITEBUFFERSIZE;
+    
+        size_t count = 0; // Just to keep track of the file size
+        size_t readed =  0;
   
-    long lastByte = 0;
+        long lastByte = 0;
   
-    // This program is going to try to read itself and move directly
-    // to the payload. Next We are going to "split" the file at that
-    // position. If everything went OK then we are going to have a 
-    // cute temporal zipfile that we can decompress using the minizip
-    // code.
-    FILE *f = fopen(argv[0],"r");
-    if(f!=NULL) {
-        fseek(f,0,SEEK_END);
-        lastByte = ftell(f);
-        if(lastByte>(payload-1)) {
-            FILE *fOut = fopen(tmpFilename,"w");
-            fseek(f,payload,SEEK_SET);
-            do {
-                readed = fread(buffer,1,WRITEBUFFERSIZE,f);
-                fwrite(buffer,1,readed,fOut);
-                count += readed;
-            } while(readed==WRITEBUFFERSIZE);
+        // This program is going to try to read itself and move directly
+        // to the payload. Next We are going to "split" the file at that
+        // position. If everything went OK then we are going to have a 
+        // cute temporal zipfile that we can decompress using the minizip
+        // code.
+        FILE *f = fopen(argv[0],"rb");
+        if(f!=NULL) {
+            fseek(f,0,SEEK_END);
+            lastByte = ftell(f);
+            if(lastByte>payload) {
+                FILE *fOut = fopen(tmpFilename, "wb" );
+                fseek(f,payload,SEEK_SET);
+                do {
+                    readed = fread(buffer,1,WRITEBUFFERSIZE,f);
+                    fwrite(buffer,1,readed,fOut);
+                    count += readed;
+                } while(readed==WRITEBUFFERSIZE);
     
-            if(feof(f)!=0) {
-                printf("Output file size: %u\n",count);
-            }
-            if(ferror(f)!=0) {
-                printf("Error reading file.\n");
+                if(feof(f)!=0) {
+                    printf("Output file size(bytes): %u\n",count);
+                }
+                if(ferror(f)!=0) {
+                    printf("Error reading file.\n");
                 
-                // Close files and exit
+                    // Close files and exit
+                    fclose(fOut);
+                    fclose(f);
+                    return 1;
+                }
                 fclose(fOut);
+            } else {
+                printf("No payload detected.\n");
+                printf("You need to append a payload at the end of this file.\n");
+                printf("For example:\n");
+                printf("$ cat miniSFX.exe payload.zip > selfextract.exe\n");
                 fclose(f);
                 return 1;
             }
-            fflush(fOut);
-            fclose(fOut);
-        } else {
-            printf("No payload detected.\n");
-            printf("You need to append a payload at the end of this file.\n");
-            printf("For example:\n");
-            printf("$ cat miniSFX.exe payload.zip > selfextract.exe\n");
             fclose(f);
+        }
+        
+        // SECOND: If the payload extraction was successfull, then we
+        // need to try to open the zipfile.
+#        ifdef USEWIN32IOAPI
+        zlib_filefunc64_def ffunc;
+#        endif
+
+        if (tmpFilename!=NULL)
+        {
+#        ifdef USEWIN32IOAPI
+            fill_win32_filefunc64A(&ffunc);
+            uf = unzOpen2_64(tmpFilename,&ffunc);
+#        else
+            uf = unzOpen64(tmpFilename);
+#        endif
+        }
+
+        if (uf==NULL)
+        {
+            printf("Cannot open %s\n",tmpFilename);
             return 1;
         }
-        fclose(f);
+        printf("%s opened\n",tmpFilename);
+
+        // THIRD: We list or extract the file.
+        if(OP==LIST) {
+            ret_value = do_list(uf);;
+        }
+        if(OP==EXTRACT) {
+            ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password);
+        }
+        
+        // FOURTH: Close files and cleanup everything
+        unzClose(uf);
+        remove(tmpFilename);
+        return ret_value;
     }
-
-    if (tmpFilename!=NULL)
-    {
-        uf = unzOpen64(tmpFilename);
-    }
-
-    if (uf==NULL)
-    {
-        printf("Cannot open %s\n",tmpFilename);
-        return 1;
-    }
-    printf("%s opened\n",tmpFilename);
-
-    ret_value = do_list(uf);
-    ret_value = do_extract(uf, opt_do_extract_withoutpath, opt_overwrite, password);
-
-    unzClose(uf);
-    
-    // Cleanup
-    remove(tmpFilename);
-    return ret_value;
 }
