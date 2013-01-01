@@ -44,6 +44,7 @@ Compiling (On Windows)
 
 3-Check the file size with "ls -al MiniSXF.exe" and modify
 the following line on minisxf.c
+  
   const size_t payload = <<New file size here>>;
 
 4-Run "make clean" and "make" again.
