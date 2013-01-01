@@ -36,14 +36,14 @@ http://www.winimage.com/zLibDll/minizip.html
 Compiling (On Windows)
 ---------------------------------------
 
-You will need to install CygWIN with gcc, make and zlib.
-Modify the paths to zlib inside the Makefile and run:
+1-You will need to install CygWIN with gcc, make and zlib.
+2-Modify the paths to zlib inside the Makefile and run:
   "make"
-Check the file size with "ls -al MiniSXF.exe" and modify
-the followingline on minisxf.c
+3-Check the file size with "ls -al MiniSXF.exe" and modify
+the following line on minisxf.c
   const size_t payload = <<New file size here>>;
-Run "make clean" and "make" again.
-Check if file size is the same if not repeat.
+4-Run "make clean" and "make" again.
+5-Check if file size is the same if not repeat from 3.
 
 Note: It's possible that this will run on linux without
 major modifications on the source code but I haven't tried
@@ -54,32 +54,34 @@ Usage (On unix systems)
 
 To generate a self extracting file in command line just
 copy the compiled executable "MiniSXF.exe" and a zipfile
-with the contents. Then merge both files with "cat":
+with the contents. Then merge both files with the following command:
 
   cat MiniSXF.exe payload.zip > generated.exe
 
-On windows just run the generated executable.
+On Windows just run the generated executable.
 
 Usage (On Windows)
 ---------------------------------------
 
-Tested on Windows 7 64 bits.
+Note: Tested on Windows 7 64 bits.
 
 If you try to Run the compiled executable it's going to warn
 you that there is no payload in the file and it's going to exit.
 
-generated.exe : Extract the contents of the payload on the current
-                directory.
+generated.exe : Extracts the contents of the payload on the current
+directory.
+
 generated.exe -v : Shows version number and copyright info.
+
 generated.exe -l : List the contents of the file.
 
 Changes from MiniSXF 0.1 to  MiniSXF 0.1.1
 ---------------------------------------
 
-+Code now compiles with the -mno-cygwin option on windows and
+* Code now compiles with the -mno-cygwin option on windows and
  runs without cygwin.
-+A lot of code cleanup, now a lot more easy to read.
-+README updated with usage options.
+* A lot of code cleanup, now a lot more easy to read.
+* README updated with usage options.
 
 Changed from MiniZip 1.0 to MiniZip 1.1
 ---------------------------------------
