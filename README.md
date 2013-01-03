@@ -1,4 +1,5 @@
-MiniSXF - Copyright (c) 2012-2013 - by Mario Gomez - version 0.1.1
+MiniSXF - Copyright (c) 2012-2013 - by Mario Gomez - version 0.1.2
+More info on http://fuenteabierta.teubi.co/
 
 Introduction
 ---------------------
@@ -38,22 +39,32 @@ Compiling (On Windows)
 
 1-You will need to install CygWIN with gcc, make and zlib.
 
-2-Modify the paths to zlib inside the Makefile and run:
+2-Copy "Makefile.cygwin32" to "Makefile"
 
-  "make"
+3-Modify the paths to zlib inside the Makefile and run:
 
-3-Check the file size with "ls -al MiniSXF.exe" and modify
+  make
+
+4-Check the file size with "ls -al MiniSXF.exe" and modify
 the following line on minisxf.c
-  
-  const size_t payload = <<New file size here>>;
 
-4-Run "make clean" and "make" again.
+  const size_t payload = 123456;
 
-5-Check if file size is the same if not repeat from 3.
+5-Run "make clean" and "make" again.
+
+6-Check if file size is the same if not repeat from 3.
 
 Note: It's possible that this will run on linux without
 major modifications on the source code but I haven't tried
 yet.
+
+Compiling (On Linux)
+---------------------------------------
+
+The same as compiling it for Windows, just select the right
+makefile "Makefile.linux" or "Makefile.linux64".
+
+Note: On linux the output filename is "MiniSXF"
 
 Usage (On unix systems)
 ---------------------------------------
@@ -81,9 +92,22 @@ generated.exe -v : Shows version number and copyright info.
 
 generated.exe -l : List the contents of the file.
 
-Changes from MiniSXF 0.1 to  MiniSXF 0.1.1
+To do:
 ---------------------------------------
 
+* zipfile password support.
+* User selectable destination directory.
+* A nice, multi-platform GUI?
+
+Changelog
+---------------------------------------
+From 0.1.1 to 0.1.2:
+* Code now compiles on Linux
+* Macros added to ioapi.c to detect if is compiled on windows
+  under cygwin.
+* Different Makefiled added for Windows and Linux
+
+From 0.1 to 0.1.1:
 * Code now compiles with the -mno-cygwin option on windows and
  runs without cygwin.
 * A lot of code cleanup, now a lot more easy to read.

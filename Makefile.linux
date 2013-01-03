@@ -1,0 +1,13 @@
+CC=gcc
+
+ZLIB_INCLUDE = -I/usr/include/
+ZLIB_LIB = /usr/lib/libz.a
+SOURCES = minisxf.c unzip.c ioapi.c
+
+all: minisxf
+
+minisxf:
+	$(CC) $(SOURCES) -o MiniSXF $(ZLIB_LIB) $(ZLIB_INCLUDE)
+
+clean:
+	rm MiniSXF

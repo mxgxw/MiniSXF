@@ -523,7 +523,7 @@ int do_extract_onefile(uf,filename,opt_extract_without_path,opt_overwrite,passwo
 
 
 void print_copyrights() {
-   printf("MiniSXF v0.1.1\n");
+   printf("MiniSXF v0.1.2\n");
    printf("The MiniZip based Self eXtracting File\n");
    printf("Copyright 2012-2013 Mario Gomez\n");
    printf("More Info and copyrights on:\n");
@@ -577,7 +577,7 @@ int main(argc,argv)
         // supposed that after compiling the file size it's not going to
         // change anymore.
         // payload: Position of the payload on the "final" file.
-        const size_t payload = 151945; // <-Update this size (DO NOT REMOVE THIS COMMENT)
+        const size_t payload = 106086; // <-Update this size (DO NOT REMOVE THIS COMMENT)
     
         const size_t buffSize = WRITEBUFFERSIZE;
     
